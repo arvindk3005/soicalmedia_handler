@@ -1,0 +1,12 @@
+services:
+  api:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: sqlite:///./pulsepilot.db
+      AI_PROVIDER: demo
+      JWT_SECRET: change-me-before-deployment
+  web:
+    build: ./frontend
+    ports: ["5173:5173"]
+    depends_on: [api]
