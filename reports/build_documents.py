@@ -26,7 +26,9 @@ def make_doc(path, title, subtitle, sections):
     for style_name in ['Title', 'Heading 1', 'Heading 2']:
         style=d.styles[style_name]; style.font.name='Aptos'; style.font.color.rgb=RGBColor(0,0,0)
         style._element.rPr.rFonts.set(qn('w:ascii'), 'Aptos')
-    d.add_heading(title,0).alignment=WD_ALIGN_PARAGRAPH.CENTER
+    title_paragraph=d.add_heading(title,0); title_paragraph.alignment=WD_ALIGN_PARAGRAPH.CENTER
+    pPr = title_paragraph._p.get_or_add_pPr()
+    for border in pPr.findall(qn('w:pBdr')): pPr.remove(border)
     p=d.add_paragraph(subtitle); p.alignment=WD_ALIGN_PARAGRAPH.CENTER
     d.add_paragraph('Team Members: Arvind Khanna (2481115) and Harsh (2481055)').alignment=WD_ALIGN_PARAGRAPH.CENTER
     d.add_paragraph('Submission: November 2026').alignment=WD_ALIGN_PARAGRAPH.CENTER
