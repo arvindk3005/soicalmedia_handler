@@ -22,7 +22,7 @@ def shade(cell, fill):
     tcPr = cell._tc.get_or_add_tcPr(); shd = OxmlElement('w:shd'); shd.set(qn('w:fill'), fill); tcPr.append(shd)
 def make_doc(path, title, subtitle, sections):
     d=Document(); sec=d.sections[0]; sec.top_margin=Inches(.7); sec.bottom_margin=Inches(.7); sec.left_margin=sec.right_margin=Inches(.8)
-    normal=d.styles['Normal']; normal.font.name='Aptos'; normal.font.size=Pt(10.5)
+    normal=d.styles['Normal']; normal.font.name='Aptos'; normal.font.size=Pt(10.5); normal.font.color.rgb=RGBColor(0,0,0)
     for style_name in ['Title', 'Heading 1', 'Heading 2']:
         style=d.styles[style_name]; style.font.name='Aptos'; style.font.color.rgb=RGBColor(0,0,0)
         style._element.rPr.rFonts.set(qn('w:ascii'), 'Aptos')
