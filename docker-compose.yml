@@ -1,12 +1,30 @@
 services:
+  mongodb:
+    image: mongo:7.0
+    container_name: pulsepilot-mongo
+    ports: ["27017:27017"]
+    volumes:
+      - mongo_data:/data/db
+
   api:
     build: ./backend
     ports: ["8000:8000"]
     environment:
-      DATABASE_URL: sqlite:///./pulsepilot.db
-      AI_PROVIDER: demo
-      JWT_SECRET: change-me-before-deployment
+      MONGODB_URL: mongodb://mongodb:27017
+      MONGODB_DATABASE: pulsepilot
+      AI_PROVIDER: gemini
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      JWT_SECRET: pulsepilot-development-secret-key-32chars
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    depends_on:
+      - mongodb
+
   web:
     build: ./frontend
     ports: ["5173:5173"]
-    depends_on: [api]
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:

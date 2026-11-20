@@ -1,1 +1,22 @@
-{"scripts":{"dev":"vite","build":"tsc -b && vite build"},"dependencies":{"react":"latest","react-dom":"latest"},"devDependencies":{"@types/node":"^26.6.6","@types/react":"^19.3.0","@types/react-dom":"^19.3.0","@vitejs/plugin-react":"latest","typescript":"latest","vite":"latest"}}
+{
+  "name": "pulsepilot-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}

@@ -1,40 +1,147 @@
-# PulsePilot AI
+# PulsePilot AI - Social Media Content Intelligence
 
-PulsePilot AI is a portfolio-ready social-media analytics workspace. It has a React + TypeScript dashboard, a FastAPI REST API, local SQLite persistence, token-based authentication, and an AI-analysis adapter that works in demo mode or with Ollama.
+PulsePilot AI is a full-stack, portfolio-ready social media analytics and content intelligence platform. Built with a modern **React + TypeScript** frontend, a high-performance **FastAPI** backend, and a **MongoDB** document database, it orchestrates AI-driven content analysis across **Google Gemini (Cloud AI)** and **Ollama (Localhost AI)**.
 
-## What it demonstrates
+---
 
-- Account registration and sign-in; passwords are salted and hashed server-side.
-- A dashboard that stores posts and metrics in SQLite through the API only.
-- A three-stage analysis pipeline: sentiment extraction, content strategy, and copy recommendations.
-- Clear provider behavior: `demo` is deterministic and needs no key; `ollama` uses a local Ollama instance when configured.
-- Input validation, useful HTTP errors, loading/error states, automated API tests, Docker configuration, and API docs at `/docs`.
+## 🌟 Key Features
 
-## Structure
+- **Full-Stack Authentication & Security**: Custom PBKDF2 password hashing with cryptographically signed, time-limited JWT bearer tokens.
+- **Dynamic Multi-Provider AI Architecture**:
+  - **Google Gemini**: Cloud-based content intelligence using `gemini-1.5-flash` with JSON schema enforcement and multimodal image analysis.
+  - **Ollama**: Private, local inference (`llama3.2` / `llama3.2-vision:11b`) running on localhost with automated error diagnostics.
+  - **In-App Model Switching**: Switch seamlessly between Gemini and Ollama right from the composer UI.
+- **Persistent MongoDB Data Layer**:
+  - User accounts and authentication credentials.
+  - User query history and structured AI analytics.
+  - Saved posts, performance metrics, and draft status.
+  - File attachments (PDF text extraction with PyPDF and image uploads).
+- **Graceful Error Diagnostics**: Transparent error reporting for model timeouts, missing API keys, unreachable Ollama instances, and database connectivity.
+- **Production-Ready Structure**: Monorepo with isolated `backend/` and `frontend/` folders, ready for Docker, Vercel, and Cloud deployments.
 
+---
+
+## 📁 Repository Structure
+
+```text
+socialmedia_resume/
+├── backend/                  # FastAPI Application
+│   ├── app/
+│   │   ├── api/              # REST Endpoints (/auth, /posts, /queries, /analysis, /uploads)
+│   │   ├── core/             # Configuration, Settings & PBKDF2/JWT Security
+│   │   ├── db/               # MongoDB driver & connection pooling
+│   │   ├── schemas/          # Pydantic data validation contracts
+│   │   └── services/         # Multi-provider AI orchestration (Gemini, Ollama, Demo)
+│   ├── tests/                # Automated pytest API & authentication test suite
+│   ├── .env.example          # Environment variable template
+│   ├── Dockerfile            # Container configuration for backend
+│   └── requirements.txt      # Python dependencies
+├── frontend/                 # React + TypeScript Client
+│   ├── src/
+│   │   ├── api/              # Typed fetch API client (multipart-safe)
+│   │   ├── main.tsx          # Dashboard, composer, AI selector, history & auth UI
+│   │   └── styles.css        # Responsive dark-theme styling
+│   ├── Dockerfile            # Container configuration for frontend
+│   └── package.json          # Node dependencies & Vite build scripts
+├── docs/                     # Architecture diagrams and specifications
+├── reports/                  # Project reports and synopsis
+├── docker-compose.yml        # Multi-container orchestration (MongoDB + API + Web)
+└── README.md                 # Project documentation
 ```
-backend/     FastAPI service, database, auth, AI services, tests
-frontend/    React TypeScript client
-docs/        architecture and walkthrough
-reports/     updated project report and synopsis
-```
 
-## Run locally
+---
 
-1. Create a Python virtual environment and install `backend/requirements.txt`.
-2. Copy `backend/.env.example` to `backend/.env`. Demo mode works unchanged.
-3. From `backend`, run `uvicorn app.main:app --reload`.
-4. From `frontend`, run `npm install` then `npm run dev`.
+## 🚀 Getting Started
 
-The API starts at `http://localhost:8000`; the client normally starts at `http://localhost:5173`.
+### 1. Prerequisites
+- **Python 3.11+**
+- **Node.js 18+** & npm
+- **MongoDB** (running locally via `brew services start mongodb-community`, Docker, or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster)
+- *(Optional)* **Ollama** installed from [ollama.ai](https://ollama.ai) (for local AI inference)
+- *(Optional)* **Gemini API Key** from [Google AI Studio](https://aistudio.google.com) (for cloud AI inference)
 
-## Optional Ollama integration
+---
 
-Install and run Ollama, then set `AI_PROVIDER=ollama` and `OLLAMA_BASE_URL=http://localhost:11434`. The application sends a constrained JSON prompt to `/api/generate`; if the provider cannot respond, the API returns a clear `502` rather than pretending an AI result was generated.
-
-## Quality checks
+### 2. Backend Setup
 
 ```bash
-cd backend && PYTHONPATH=. pytest
-cd ../frontend && npm run build
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Create and activate a Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Configure environment variables
+cp .env.example .env
 ```
+
+Edit `backend/.env` with your settings:
+```ini
+MONGODB_URL=mongodb://localhost:27017
+MONGODB_DATABASE=pulsepilot
+JWT_SECRET=your-random-32-character-secret-key
+
+# AI Configuration
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-1.5-flash
+
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+```
+
+Start the FastAPI development server:
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+*API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.*
+
+---
+
+### 3. Frontend Setup
+
+In a new terminal window:
+```bash
+# 1. Navigate to frontend directory
+cd frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Start development server
+npm run dev
+```
+*The React application will open at `http://localhost:5173`.*
+
+---
+
+### 4. Running with Docker Compose
+
+To start MongoDB, the FastAPI backend, and the React frontend in a single command:
+```bash
+docker compose up --build
+```
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+Run the automated test suite covering authentication, multi-provider AI routing, validation, and error states:
+```bash
+# From the root directory:
+PYTHONPATH=. backend/.venv/bin/pytest backend/tests/test_api.py -v
+
+# Test frontend build:
+npm --prefix frontend run build
+```
+
+---
+
+## 📌 Team & Project Info
+- **Project**: PulsePilot AI - Social Media Content Intelligence
+- **Team**: Arvind Khanna & Team
+- **Stack**: React, TypeScript, FastAPI, MongoDB, Gemini API, Ollama, Pytest, Docker

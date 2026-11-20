@@ -14,18 +14,18 @@ def verify_password(password: str, encoded: str) -> bool:
 def _b64(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
 
-def issue_token(user_id: int) -> str:
+def issue_token(user_id: str) -> str:
     payload = _b64(json.dumps({"sub": user_id, "exp": int(time.time()) + 86400}).encode())
     signature = hmac.new(get_settings().jwt_secret.encode(), payload.encode(), hashlib.sha256).digest()
     return f"{payload}.{_b64(signature)}"
 
-def read_token(token: str) -> int:
+def read_token(token: str) -> str:
     try:
         payload, signature = token.split(".")
         expected = _b64(hmac.new(get_settings().jwt_secret.encode(), payload.encode(), hashlib.sha256).digest())
         if not hmac.compare_digest(signature, expected): raise ValueError
         data = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
         if data["exp"] < time.time(): raise ValueError
-        return int(data["sub"])
+        return str(data["sub"])
     except Exception:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired access token")
